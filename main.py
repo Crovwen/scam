@@ -1,8 +1,12 @@
 import telebot
+import threading
+from flask import Flask
+import os
 
 TOKEN = "8437336707:AAEOanY7dPCDno66-7s9ImupM_xNcIlUduo"
 bot = telebot.TeleBot(TOKEN)
 
+# متن پیام
 MESSAGE = """🟢 Owner $ADA 100X 💲: @Owner_ADA100x_free
 .
 🟢Robot $ADA 100X 💲 : @free100x_ADAbot
@@ -24,5 +28,20 @@ def send_welcome(message):
     with open(PHOTO_PATH, 'rb') as photo:
         bot.send_photo(message.chat.id, photo, caption=MESSAGE)
 
-print("Bot is running...")
-bot.infinity_polling()
+# تابع اجرای بات
+def run_bot():
+    bot.infinity_polling()
+
+# اجرای بات در یک Thread جدا
+threading.Thread(target=run_bot).start()
+
+# وب‌سرور Flask
+app = Flask(__name__)
+
+@app.route("/")
+def home():
+    return "Bot is running!"
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
